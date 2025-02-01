@@ -18,6 +18,7 @@ Usage:
     protonvpn examples
     protonvpn (-h | --help)
     protonvpn (-v | --version)
+    protonvpn import-env
 
 Options:
     -f, --fastest       Select the fastest ProtonVPN server.
