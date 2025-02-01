@@ -75,6 +75,7 @@ def main():
         sys.exit(1)
 
 
+
 def cli():
     """Run user's input command."""
 
@@ -151,6 +152,91 @@ def cli():
         pull_server_data(force=True)
     elif args.get("examples"):
         print_examples()
+    elif args.get("import-env"):
+        check_root()
+        import_env_config()
+
+def import_env_config():
+    """
+    Đọc cấu hình từ các biến môi trường:
+        PROTONVPN_USERNAME
+        PROTONVPN_PASSWORD
+        TIER
+        PROTOCOL
+    rồi ghi đè vào cấu hình ProtonVPN CLI.
+    """
+    # Kiểm tra biến môi trường
+    required_envs = ["USERNAME", "PASSWORD", "TIER", "PROTOCOL"]
+    missing = []
+    for env_name in required_envs:
+        if env_name not in os.environ:
+            missing.append(env_name)
+
+    if missing:
+        print("[!] Thiếu các biến môi trường sau: " + ", ".join(missing))
+        sys.exit(1)
+
+    username = os.environ["PROTONVPN_USERNAME"]
+    password = os.environ["PROTONVPN_PASSWORD"]
+    try:
+        tier = int(os.environ["TIER"])
+    except ValueError:
+        print("[!] Biến môi trường TIER phải là số (1,2,3,4).")
+        sys.exit(1)
+    protocol = os.environ["PROTOCOL"].lower().strip()
+
+    if protocol not in ["udp", "tcp"]:
+        print("[!] PROTOCOL chỉ được phép là udp hoặc tcp.")
+        sys.exit(1)
+
+    # Nếu đã init trước đó thì hỏi ghi đè
+    try:
+        if int(get_config_value("USER", "initialized")) == 1:
+            print("Đã phát hiện cấu hình ProtonVPN cũ.")
+            overwrite = input("Bạn có muốn ghi đè cấu hình cũ? [y/N]: ").lower().strip()
+            if overwrite != "y":
+                print("Hủy thao tác import-env.")
+                sys.exit(0)
+            connection.disconnect(passed=True)
+    except KeyError:
+        pass
+
+    # Tạo thư mục config nếu chưa có
+    if not os.path.isdir(CONFIG_DIR):
+        os.mkdir(CONFIG_DIR)
+    change_file_owner(CONFIG_DIR)
+
+    # Tạo file config mặc định nếu chưa có
+    if not os.path.isfile(CONFIG_FILE):
+        init_config_file()
+
+    # Xử lý tier = 4 => Visionary => tương đương Plus (3)
+    if tier == 4:
+        tier = 3
+    # Subtract 1 để tương thích logic
+    # (Free=0, Basic=1, Plus=2, Visionary=3)
+    tier = tier - 1
+
+    # Ghi vào file cấu hình
+    set_config_value("USER", "username", username)
+    set_config_value("USER", "tier", str(tier))
+    set_config_value("USER", "default_protocol", protocol)
+    set_config_value("USER", "dns_leak_protection", 1)
+    set_config_value("USER", "custom_dns", None)
+    set_config_value("USER", "killswitch", 0)
+
+    # Ghi passfile
+    with open(PASSFILE, "w") as fp:
+        fp.write(f"{username}{CLIENT_SUFFIX}\n{password}")
+    os.chmod(PASSFILE, 0o600)
+
+    set_config_value("USER", "initialized", 1)
+
+    # Cập nhật server
+    pull_server_data(force=True)
+
+    print("\nImport cấu hình từ biến môi trường thành công!")
+    logger.debug("Import config từ env hoàn tất.")
 
 
 def init_cli():
