@@ -388,18 +388,7 @@ def set_username_password(write=False):
 
     # Ask for the password and confirmation until both are the same
     while True:
-        ovpn_password1 = getpass.getpass(
-            "Enter your ProtonVPN OpenVPN password: "
-        )
-        ovpn_password2 = getpass.getpass(
-            "Confirm your ProtonVPN OpenVPN password: "
-        )
-
-        if not ovpn_password1 == ovpn_password2:
-            print()
-            print("[!] The passwords do not match. Please try again.")
-        else:
-            break
+        ovpn_password1 = input("Enter your ProtonVPN OpenVPN password: ")
 
     if write:
         set_config_value("USER", "username", ovpn_username)
