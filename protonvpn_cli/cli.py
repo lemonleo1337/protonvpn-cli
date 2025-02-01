@@ -251,7 +251,7 @@ def import_env_config():
 
     # Ghi passfile
     with open(PASSFILE, "w") as fp:
-        fp.write(f"{username}{CLIENT_SUFFIX}\n{password}")
+        fp.write(f"{username}+{CLIENT_SUFFIX}\n{password}")
     os.chmod(PASSFILE, 0o600)
 
     set_config_value("USER", "initialized", 1)
