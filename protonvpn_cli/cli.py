@@ -100,6 +100,9 @@ def cli():
     # Parse arguments
     if args.get("init"):
         init_cli()
+    elif args.get("import-env"):
+        check_root()
+        import_env_config()
     elif args.get("c") or args.get("connect"):
         check_root()
         check_init()
@@ -152,9 +155,7 @@ def cli():
         pull_server_data(force=True)
     elif args.get("examples"):
         print_examples()
-    elif args.get("import-env"):
-        check_root()
-        import_env_config()
+    
 
 def import_env_config():
     """
