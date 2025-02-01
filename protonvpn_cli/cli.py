@@ -166,7 +166,7 @@ def import_env_config():
     rồi ghi đè vào cấu hình ProtonVPN CLI.
     """
     # Kiểm tra biến môi trường
-    required_envs = ["USERNAME", "PASSWORD", "TIER", "PROTOCOL"]
+    required_envs = ["PVPN_USERNAME", "PVPN_PASSWORD", "TIER", "PROTOCOL"]
     missing = []
     for env_name in required_envs:
         if env_name not in os.environ:
@@ -176,8 +176,8 @@ def import_env_config():
         print("[!] Thiếu các biến môi trường sau: " + ", ".join(missing))
         sys.exit(1)
 
-    username = os.environ["USERNAME"]
-    password = os.environ["PASSWORD"]
+    username = os.environ["PVPN_USERNAME"]
+    password = os.environ["PVPN_PASSWORD"]
     try:
         tier = int(os.environ["TIER"])
     except ValueError:
