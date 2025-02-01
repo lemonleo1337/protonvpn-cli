@@ -497,8 +497,8 @@ def set_username_password(write=False):
     ovpn_username = input("Enter your ProtonVPN OpenVPN username: ")
 
     # Ask for the password and confirmation until both are the same
-    while True:
-        ovpn_password1 = input("Enter your ProtonVPN OpenVPN password: ")
+    
+    ovpn_password1 = input("Enter your ProtonVPN OpenVPN password: ")
 
     if write:
         set_config_value("USER", "username", ovpn_username)
