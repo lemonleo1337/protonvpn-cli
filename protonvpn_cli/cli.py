@@ -176,8 +176,8 @@ def import_env_config():
         print("[!] Thiếu các biến môi trường sau: " + ", ".join(missing))
         sys.exit(1)
 
-    username = os.environ["PROTONVPN_USERNAME"]
-    password = os.environ["PROTONVPN_PASSWORD"]
+    username = os.environ["USERNAME"]
+    password = os.environ["PASSWORD"]
     try:
         tier = int(os.environ["TIER"])
     except ValueError:
