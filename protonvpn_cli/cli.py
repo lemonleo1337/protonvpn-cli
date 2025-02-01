@@ -167,6 +167,28 @@ def import_env_config():
         PROTOCOL
     rồi ghi đè vào cấu hình ProtonVPN CLI.
     """
+    def init_config_file():
+        """Khởi tạo file pvpn-cli.cfg mặc định."""
+        config = configparser.ConfigParser()
+        config["USER"] = {
+            "username": "None",
+            "tier": "None",
+            "default_protocol": "None",
+            "initialized": "0",
+            "dns_leak_protection": "1",
+            "custom_dns": "None",
+            "check_update_interval": "3",
+            "api_domain": "https://api.protonvpn.ch",
+        }
+        config["metadata"] = {
+            "last_api_pull": "0",
+            "last_update_check": str(int(time.time())),
+        }
+
+        with open(CONFIG_FILE, "w") as f:
+            config.write(f)
+        change_file_owner(CONFIG_FILE)
+        logger.debug("pvpn-cli.cfg initialized")
     # Kiểm tra biến môi trường
     required_envs = ["PVPN_USERNAME", "PVPN_PASSWORD", "TIER", "PROTOCOL"]
     missing = []
